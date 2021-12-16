@@ -1,9 +1,5 @@
 /*
- *  Simple hello world Json REST response
-  *  by Mischianti Renzo <https://www.mischianti.org>
- *
- *  https://www.mischianti.org/
- *
+ *  Simple Arduino WIFI Sensor Json REST response
  */
  
 #include "Arduino.h"
@@ -14,6 +10,8 @@
  
 const char* ssid = "Familia Zalas Rodrigues";
 const char* password = "83115612";
+
+String sensor_id = "1";
 
 int sensorPin = A0;    // select the input pin for the potentiometer
 int ledPin = 13;      // select the pin for the LED
@@ -26,9 +24,10 @@ ESP8266WebServer server(80);
 void getHelloWord() {
     sensorValue = analogRead(sensorPin);
     value = String (sensorValue);
+    Serial.println("sensor:" + sensor_id + " value:" + value);
     server.send(200, 
         "text/json", 
-        "{\"name\": \"world:"  + value +   "\"}"
+        "{\"value\": \"" + value +  "\"}"
     );
 }
  
@@ -36,9 +35,9 @@ void getHelloWord() {
 void restServerRouting() {
     server.on("/", HTTP_GET, []() {
         server.send(200, F("text/html"),
-            F("Welcome to the REST Web Server"));
+            F("Arduino REST Web Server"));
     });
-    server.on(F("/helloWorld"), HTTP_GET, getHelloWord);
+    server.on(F("/getValue"), HTTP_GET, getHelloWord);
 }
  
 // Manage not found URL
@@ -90,6 +89,7 @@ void setup(void) {
   // Start server
   server.begin();
   Serial.println("HTTP server started");
+  Serial.println("Registered Sensor ID:" + sensor_id);
 }
  
 void loop(void) {
